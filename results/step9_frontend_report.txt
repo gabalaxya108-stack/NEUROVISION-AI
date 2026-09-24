@@ -1,0 +1,138 @@
+================================================================================
+STEP 9 REPORT: FRONTEND WEB APPLICATION & BACKEND INTEGRATION
+================================================================================
+Project: Brain MRI Tumor Classification (Educational & Research)
+Frontend Framework: React 19 + Vite 6 (JavaScript, Vanilla CSS Design System)
+Backend Framework: FastAPI 0.115.6 + Uvicorn 0.34.0 (Python 3.13)
+Model Checkpoint: models/best_brain_tumor_model.keras (EfficientNetB0)
+Date: September 24, 2026
+
+--------------------------------------------------------------------------------
+1. FRONTEND TECHNOLOGY & ARCHITECTURE
+--------------------------------------------------------------------------------
+Core: React 19, JavaScript (ES Modules), HTML5 semantic structure.
+Styling: Pure Vanilla CSS with a customized clinical research design system:
+  - styles/index.css: Design tokens (clinical slate & navy palette, typography, shadows)
+  - styles/layout.css: Responsive navigation, active tab indicator, disclaimer banner, footer
+  - styles/components.css: Drag-and-drop dropzone, prediction cards, probability bars, tabs, modal
+  - styles/pages.css: Hero section, stats grid, performance tables, error analysis gallery, methodology flowchart
+Build Tool: Vite 6 with production bundling (337ms build time, zero errors/warnings).
+Proxy Configuration: Configured in vite.config.js to seamlessly proxy API routes (/predict, /explain,
+  /health, /model-info, /results, /samples) directly to FastAPI backend on port 8000.
+
+--------------------------------------------------------------------------------
+2. PAGES CREATED
+--------------------------------------------------------------------------------
+1. Dashboard (pages/Dashboard.jsx)
+   - Hero section: "BRAIN MRI CLASSIFICATION" & research subtitle.
+   - Primary Call-to-Action: [ Analyze MRI ] button navigating to analyzer.
+   - Four Core Project Statistics Cards:
+       * 7,200 MRI Images (5,600 training, 1,600 held-out test scans)
+       * 4 Classes (Glioma, Meningioma, Pituitary, No Tumor)
+       * 92.81% Test-set classification accuracy (Explicitly labeled)
+       * EfficientNetB0 Architecture (Transfer learning with ImageNet weights)
+   - Technical capability cards & academic research disclaimer banner.
+
+2. Analyze MRI (pages/AnalyzeMRI.jsx)
+   - Large drag-and-drop upload zone with format & 10MB size validation.
+   - Interactive Curated Demonstration Tray: 5 pre-packaged sample MRIs (Healthy Scan,
+     Glioma, Meningioma, Pituitary, Normal Control) for instantaneous 1-click evaluation.
+   - Image preview with filename, pixel dimensions, and remove/change controls.
+   - Analysis workflow with subtle loading indicator ("Analyzing image...").
+   - PredictionCard: Displays predicted class, model confidence score, and horizontal
+     probability distribution bars for all 4 classes.
+   - GradcamViewer: Real-time Grad-CAM tabs (Overlay, Heatmap, Original MRI, Complete 3-Panel Figure)
+     with zoom/enlarge modal and interpretability guidance.
+   - Comprehensive result states: Initial, Ready, Analyzing, Success, Error (with clean messages).
+
+3. Model Performance (pages/ModelPerformance.jsx)
+   - Test-set summary cards: 1,600 test images, 1,485 correct, 115 errors, 92.81% accuracy,
+     93.13% macro precision, 92.81% macro recall, 92.63% macro F1-score.
+   - Interactive confusion matrix tabs (Raw Counts Matrix vs. Normalized Percentages Matrix).
+   - Per-class metrics table documenting precision, recall, and F1 per category.
+   - Explicit disclaimer: "These metrics represent performance on this academic test dataset and are not clinical validation results."
+
+4. Error Analysis (pages/ErrorAnalysis.jsx)
+   - High-level failure statistics: 115 errors (7.19% error rate), 56 Glioma → Meningioma errors,
+     56 high-confidence errors (≥80%), and 46 borderline predictions (<60%).
+   - Interactive charts grid:
+       * Misclassification pairs frequency (results/misclassification_pairs.png)
+       * Confidence distribution comparison (results/confidence_correct_vs_incorrect.png)
+       * Confidence breakdown by predicted class (results/confidence_by_class.png)
+   - Representative Failure Gallery: Displays specific error cases (e.g. Te-gl_109.jpg,
+     Te-gl_160.jpg, Te-gl_144.jpg) with actual class, predicted class, confidence,
+     radiological failure analysis, and interactive [ View Grad-CAM ] modal.
+   - Clear caution: highlighted regions represent model activation, not confirmed tumor location.
+
+5. Methodology (pages/Methodology.jsx)
+   - Visual 9-Step ML Pipeline Flowchart:
+     1. Dataset Acquisition & Hash Audit (7,200 images)
+     2. Aspect-Preserving Letterbox Preprocessing (224×224×3)
+     3. Reproducible Stratified Train/Val Split (80/20, seed 42)
+     4. Two-Phase Transfer Learning (EfficientNetB0)
+     5. Validation Checkpoint Selection (96.25% val acc)
+     6. Held-out Test Benchmark Evaluation (92.81% test acc)
+     7. Explainable AI via Grad-CAM (top_activation layer)
+     8. Clean Inference REST API (FastAPI)
+     9. Interactive Web Application (Vite + React)
+   - Dataset distribution breakdown, preprocessing specifications, and data leakage discussion.
+
+--------------------------------------------------------------------------------
+3. API ENDPOINTS INTEGRATED (services/api.js)
+--------------------------------------------------------------------------------
+- Centralized client with AbortController timeout handling (30s max).
+- GET /health: Periodic 15s polling to update the navbar connection status pill.
+- GET /model-info: Queries model architecture parameters and test accuracy.
+- POST /predict: Dispatches multipart/form-data image; receives class prediction and scores.
+- POST /explain: Requests Grad-CAM base64 data URIs for overlay, heatmap, and 3-panel figure.
+
+--------------------------------------------------------------------------------
+4. RESPONSIVE DESIGN & ACCESSIBILITY
+--------------------------------------------------------------------------------
+- Fully responsive across desktop (1200px+), tablet (768px-1024px), and mobile (<640px).
+- Mobile collapsible hamburger navigation menu.
+- WCAG-compliant high-contrast color scheme (navy/slate text on pure white/soft gray surfaces).
+- Semantic HTML5 tags (<header>, <nav>, <main>, <section>, <aside>, <footer role="...">).
+- Visible focus rings, keyboard modal dismissal (Escape key), and descriptive image alt attributes.
+
+--------------------------------------------------------------------------------
+5. SECURITY & PRIVACY
+--------------------------------------------------------------------------------
+- Client-side image validation (enforces JPEG/PNG and 10MB limits before dispatch).
+- Zero permanent storage of uploaded images in frontend local storage or cookies.
+- Reset button immediately wipes temporary image URLs and memory buffers.
+- No personal health information (PHI) collected.
+
+--------------------------------------------------------------------------------
+6. INTEGRATION & END-TO-END TEST RESULTS
+--------------------------------------------------------------------------------
+1. Backend Health Check: PASSED (GET /health -> {"status":"ok","model_loaded":true})
+2. Model Info Query: PASSED (GET /model-info -> EfficientNetB0, 4 classes, 92.81% accuracy)
+3. Proxy Integration: PASSED (Port 5173 correctly proxies /health, /predict, /explain, /results)
+4. Prediction Inference: PASSED (POST /predict with sample_glioma.jpg -> Predicted: glioma, confidence: 97.32%)
+5. Standalone Parity: PASSED (Frontend results identical to src/predict.py)
+6. Grad-CAM Generation: PASSED (POST /explain returns valid base64 PNG data URIs)
+7. Static Results Asset Loading: PASSED (HTTP 200 OK for confusion matrix, error charts, samples)
+8. Invalid Image Rejection: PASSED (Clean 400/415 errors handled and displayed to user)
+
+--------------------------------------------------------------------------------
+7. HOW TO RUN THE APPLICATION
+--------------------------------------------------------------------------------
+Backend API:
+  uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+  URL: http://127.0.0.1:8000
+  Swagger UI: http://127.0.0.1:8000/docs
+
+Frontend Web App:
+  cd frontend
+  npm run dev
+  URL: http://127.0.0.1:5173
+
+--------------------------------------------------------------------------------
+8. KNOWN LIMITATIONS
+--------------------------------------------------------------------------------
+- Model performance is evaluated strictly on this academic benchmark dataset and has not
+  been clinically validated on diverse external scanner populations.
+- Grad-CAM heatmaps visualize neural network gradient attribution on the 224x224 letterboxed
+  feature map and should not be used as biological surgical margins or medical diagnostic certainty.
+================================================================================

@@ -1,0 +1,123 @@
+{
+    "test_samples": 1600,
+    "correct": 1485,
+    "incorrect": 115,
+    "accuracy": 0.9281,
+    "error_rate": 0.0719,
+    "mean_confidence_correct": 0.9729,
+    "mean_confidence_incorrect": 0.7591,
+    "high_confidence_error_count": 56,
+    "borderline_prediction_count": 46,
+    "class_metrics": {
+        "glioma": {
+            "total_images": 400,
+            "correct": 312,
+            "incorrect": 88,
+            "accuracy": 0.78,
+            "precision": 0.972,
+            "recall": 0.78,
+            "f1_score": 0.8655,
+            "mean_confidence": 0.9036,
+            "median_confidence": 0.9793,
+            "min_confidence": 0.3514,
+            "max_confidence": 1.0
+        },
+        "meningioma": {
+            "total_images": 400,
+            "correct": 376,
+            "incorrect": 24,
+            "accuracy": 0.94,
+            "precision": 0.8664,
+            "recall": 0.94,
+            "f1_score": 0.9017,
+            "mean_confidence": 0.9416,
+            "median_confidence": 0.983,
+            "min_confidence": 0.3944,
+            "max_confidence": 1.0
+        },
+        "pituitary": {
+            "total_images": 400,
+            "correct": 400,
+            "incorrect": 0,
+            "accuracy": 1.0,
+            "precision": 0.9569,
+            "recall": 1.0,
+            "f1_score": 0.978,
+            "mean_confidence": 0.9929,
+            "median_confidence": 0.9998,
+            "min_confidence": 0.5654,
+            "max_confidence": 1.0
+        },
+        "notumor": {
+            "total_images": 400,
+            "correct": 397,
+            "incorrect": 3,
+            "accuracy": 0.9925,
+            "precision": 0.9297,
+            "recall": 0.9925,
+            "f1_score": 0.9601,
+            "mean_confidence": 0.9919,
+            "median_confidence": 0.9992,
+            "min_confidence": 0.419,
+            "max_confidence": 1.0
+        }
+    },
+    "misclassification_pairs": {
+        "glioma_to_meningioma": {
+            "actual_class": "glioma",
+            "predicted_class": "meningioma",
+            "count": 56,
+            "percentage_of_errors": 48.7,
+            "percentage_of_dataset": 3.5
+        },
+        "glioma_to_notumor": {
+            "actual_class": "glioma",
+            "predicted_class": "notumor",
+            "count": 25,
+            "percentage_of_errors": 21.74,
+            "percentage_of_dataset": 1.56
+        },
+        "meningioma_to_pituitary": {
+            "actual_class": "meningioma",
+            "predicted_class": "pituitary",
+            "count": 11,
+            "percentage_of_errors": 9.57,
+            "percentage_of_dataset": 0.69
+        },
+        "meningioma_to_glioma": {
+            "actual_class": "meningioma",
+            "predicted_class": "glioma",
+            "count": 8,
+            "percentage_of_errors": 6.96,
+            "percentage_of_dataset": 0.5
+        },
+        "glioma_to_pituitary": {
+            "actual_class": "glioma",
+            "predicted_class": "pituitary",
+            "count": 7,
+            "percentage_of_errors": 6.09,
+            "percentage_of_dataset": 0.44
+        },
+        "meningioma_to_notumor": {
+            "actual_class": "meningioma",
+            "predicted_class": "notumor",
+            "count": 5,
+            "percentage_of_errors": 4.35,
+            "percentage_of_dataset": 0.31
+        },
+        "notumor_to_meningioma": {
+            "actual_class": "notumor",
+            "predicted_class": "meningioma",
+            "count": 2,
+            "percentage_of_errors": 1.74,
+            "percentage_of_dataset": 0.12
+        },
+        "notumor_to_glioma": {
+            "actual_class": "notumor",
+            "predicted_class": "glioma",
+            "count": 1,
+            "percentage_of_errors": 0.87,
+            "percentage_of_dataset": 0.06
+        }
+    }
+}

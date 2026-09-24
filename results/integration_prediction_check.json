@@ -1,0 +1,20 @@
+{
+  "image": "sample_glioma.jpg",
+  "cli_prediction": "glioma",
+  "api_prediction": "glioma",
+  "frontend_prediction": "glioma",
+  "cli_probabilities": {
+    "glioma": 0.9732,
+    "meningioma": 0.0006,
+    "pituitary": 0.005699999999999999,
+    "notumor": 0.020499999999999997
+  },
+  "api_probabilities": {
+    "glioma": 0.9732,
+    "meningioma": 0.0006,
+    "pituitary": 0.0057,
+    "notumor": 0.0205
+  },
+  "prediction_consistent": true,
+  "max_probability_difference": 0.0
+}

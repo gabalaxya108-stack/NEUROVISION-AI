@@ -1,0 +1,108 @@
+{
+    "model_architecture": "EfficientNetB0 (Transfer Learning)",
+    "input_shape": [
+        224,
+        224,
+        3
+    ],
+    "num_classes": 4,
+    "classes": [
+        "glioma",
+        "meningioma",
+        "pituitary",
+        "notumor"
+    ],
+    "random_seed": 42,
+    "parameters": {
+        "phase1": {
+            "trainable": 5124,
+            "non_trainable": 4049571,
+            "total": 4054695
+        },
+        "phase2": {
+            "trainable": 1467876,
+            "non_trainable": 2586819,
+            "total": 4054695
+        }
+    },
+    "training_time_seconds": 3773.16,
+    "epochs_completed": {
+        "phase1": 10,
+        "phase2": 10,
+        "total": 20
+    },
+    "best_epoch_index": 19,
+    "best_validation_loss": 0.10585254430770874,
+    "best_validation_accuracy": 0.9624999761581421,
+    "validation_metrics": {
+        "dataset_name": "Validation",
+        "total_samples": 1120,
+        "accuracy": 0.9625,
+        "macro_precision": 0.9626985849791394,
+        "macro_recall": 0.9625,
+        "macro_f1": 0.9623480366658974,
+        "weighted_precision": 0.9626985849791396,
+        "weighted_recall": 0.9625,
+        "weighted_f1": 0.9623480366658975,
+        "per_class": {
+            "glioma": {
+                "class_id": 0,
+                "precision": 0.9644128113879004,
+                "recall": 0.9678571428571429,
+                "f1_score": 0.966131907308378,
+                "support": 280
+            },
+            "meningioma": {
+                "class_id": 1,
+                "precision": 0.9516728624535316,
+                "recall": 0.9142857142857143,
+                "f1_score": 0.9326047358834244,
+                "support": 280
+            },
+            "pituitary": {
+                "class_id": 2,
+                "precision": 0.9455782312925171,
+                "recall": 0.9928571428571429,
+                "f1_score": 0.9686411149825784,
+                "support": 280
+            },
+            "notumor": {
+                "class_id": 3,
+                "precision": 0.9891304347826086,
+                "recall": 0.975,
+                "f1_score": 0.9820143884892086,
+                "support": 280
+            }
+        },
+        "confusion_matrix": [
+            [
+                271,
+                8,
+                1,
+                0
+            ],
+            [
+                8,
+                256,
+                13,
+                3
+            ],
+            [
+                0,
+                2,
+                278,
+                0
+            ],
+            [
+                2,
+                3,
+                2,
+                273
+            ]
+        ],
+        "classification_report_str": "              precision    recall  f1-score   support\n\n      glioma     0.9644    0.9679    0.9661       280\n  meningioma     0.9517    0.9143    0.9326       280\n   pituitary     0.9456    0.9929    0.9686       280\n     notumor     0.9891    0.9750    0.9820       280\n\n    accuracy                         0.9625      1120\n   macro avg     0.9627    0.9625    0.9623      1120\nweighted avg     0.9627    0.9625    0.9623      1120\n"
+    },
+    "overfitting_assessment": "Minimal/Controlled overfitting: Training accuracy and validation accuracy are closely aligned (gap: 0.0071). Regularization (Dropout=0.3 and conservative augmentations) successfully stabilized generalization.",
+    "best_model_path": "/Users/laxyagaba/Downloads/brain_tumor_project/models/best_brain_tumor_model.keras",
+    "final_model_path": "/Users/laxyagaba/Downloads/brain_tumor_project/models/final_brain_tumor_model.keras"
+}

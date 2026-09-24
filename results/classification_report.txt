@@ -1,0 +1,19 @@
+Brain MRI Classification Report - Untouched Test Dataset
+============================================================
+
+              precision    recall  f1-score   support
+
+      glioma     0.9720    0.7800    0.8655       400
+  meningioma     0.8664    0.9400    0.9017       400
+   pituitary     0.9569    1.0000    0.9780       400
+     notumor     0.9297    0.9925    0.9601       400
+
+    accuracy                         0.9281      1600
+   macro avg     0.9313    0.9281    0.9263      1600
+weighted avg     0.9313    0.9281    0.9263      1600
+
+============================================================
+Total Test Samples: 1600
+Correct Predictions: 1485
+Incorrect Predictions: 115
+Notice: Machine learning classification evaluation on academic dataset.

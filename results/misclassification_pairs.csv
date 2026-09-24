@@ -1,0 +1,9 @@
+actual_class,predicted_class,count,percentage_of_errors,percentage_of_dataset
+glioma,meningioma,56,48.7,3.5
+glioma,notumor,25,21.74,1.56
+meningioma,pituitary,11,9.57,0.69
+meningioma,glioma,8,6.96,0.5
+glioma,pituitary,7,6.09,0.44
+meningioma,notumor,5,4.35,0.31
+notumor,meningioma,2,1.74,0.12
+notumor,glioma,1,0.87,0.06

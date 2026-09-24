@@ -1,0 +1,5 @@
+class_name,display_name,total_images,correct,incorrect,accuracy,precision,recall,f1_score,mean_confidence,median_confidence,min_confidence,max_confidence
+glioma,Glioma,400,312,88,0.78,0.972,0.78,0.8655,0.9036,0.9793,0.3514,1.0
+meningioma,Meningioma,400,376,24,0.94,0.8664,0.94,0.9017,0.9416,0.983,0.3944,1.0
+pituitary,Pituitary,400,400,0,1.0,0.9569,1.0,0.978,0.9929,0.9998,0.5654,1.0
+notumor,No Tumor,400,397,3,0.9925,0.9297,0.9925,0.9601,0.9919,0.9992,0.419,1.0

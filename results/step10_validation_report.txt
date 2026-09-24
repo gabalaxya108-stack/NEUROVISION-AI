@@ -1,0 +1,264 @@
+================================================================================
+STEP 10 VALIDATION REPORT: END-TO-END VALIDATION & SHOWCASE AUDIT
+================================================================================
+Project: Brain MRI Tumor Classification (Educational & Research Platform)
+Date: September 24, 2026
+Backbone Architecture: EfficientNetB0 (ImageNet Transfer Learning, 2-Stage Training)
+Inference Backend: FastAPI + Uvicorn (Resident Memory Model)
+Frontend Interface: React 19 + Vite 8 SPA (Clinical Research Design System)
+
+================================================================================
+1. BACKEND STATUS
+================================================================================
+- Operational State: ACTIVE / HEALTHY
+- Server: Uvicorn running on http://127.0.0.1:8000
+- Startup Lifespan: Model loaded once during lifespan startup. Resident in memory.
+- Health Endpoint: GET /health -> {"status": "ok", "model_loaded": true}
+- Model Info: GET /model-info -> EfficientNetB0, input_shape: [224, 224, 3], classes: 4, test_accuracy: 0.9281
+- Prediction Endpoint: POST /predict (Protected by server-side input guardrail)
+- Explainability Endpoint: POST /explain (Protected by server-side input guardrail)
+- Error Handling: Standardized JSON responses for 400, 415, 422, 500, 503. Zero internal Python stack traces leaked.
+
+================================================================================
+2. FRONTEND STATUS
+================================================================================
+- Operational State: ACTIVE / HEALTHY
+- Dev Server: Vite 8.3.0 running on http://127.0.0.1:5173
+- Production Build: Verified via `npm run build` -> 34 modules transformed, built in 186ms without errors.
+- Linter Check: Verified via `npm run lint` (oxlint) -> 0 errors, 0 warnings across 17 files.
+- Navigation Flow: Multi-page SPA (Dashboard, Analyze MRI, Model Performance, Error Analysis, Methodology).
+- State Management: React useState / useEffect with unified API client and AbortController request lifecycle.
+
+================================================================================
+3. PREDICTION CONSISTENCY TEST
+================================================================================
+- Evaluated on identical test MRI: `samples/sample_glioma.jpg`
+- Execution Channels:
+  A. Standalone CLI: `python3 src/predict.py samples/sample_glioma.jpg`
+  B. Inference API: `POST http://127.0.0.1:8000/predict`
+  C. Frontend Client: React API client calling POST /predict
+- Results:
+  * CLI Prediction: "glioma" (Confidence: 97.32%)
+    - Probabilities: glioma: 0.9732, meningioma: 0.0006, pituitary: 0.0057, notumor: 0.0205
+  * API Prediction: "glioma" (Confidence: 97.32%)
+    - Probabilities: glioma: 0.9732, meningioma: 0.0006, pituitary: 0.0057, notumor: 0.0205
+  * Frontend Prediction: "glioma" (Confidence: 97.32%)
+  * Predicted Class Identical: TRUE
+  * Class Ordering Identical: TRUE ([glioma, meningioma, pituitary, notumor])
+  * Max Probability Difference: 0.000000 (Within float tolerance)
+- Output Artifact: `results/integration_prediction_check.json` (PASS)
+
+================================================================================
+4. GRAD-CAM CONSISTENCY
+================================================================================
+- Execution Channels Compared:
+  * CLI Tool: `src/explain.py`
+  * API Endpoint: `POST /explain`
+- Consistency Invariants Verified:
+  * Same Model Checkpoint: `models/best_brain_tumor_model.keras`
+  * Same Preprocessing: Letterbox resize to 224x224x3 (aspect ratio preserved, black padding)
+  * Same Target Layer: `top_activation` (EfficientNetB0 final conv activation, 7x7x1280)
+  * Same Class Output: Matches top predicted class index
+- Frontend Integration: Frontend displays backend-generated base64 PNGs directly.
+  No secondary Grad-CAM computation occurs in JavaScript. (PASS)
+
+================================================================================
+5. IMAGE FORMAT TESTS
+================================================================================
+Evaluated via `test_image_formats.py` against `POST /predict`:
+- Test 1: RGB JPEG -> HTTP 200 (Accepted: True, Prediction: glioma, Conf: 0.9725) -> PASS
+- Test 2: Grayscale JPEG (L mode) -> HTTP 200 (Accepted: True, Prediction: glioma, Conf: 0.9725) -> PASS
+- Test 3: RGB PNG -> HTTP 200 (Accepted: True, Prediction: glioma, Conf: 0.9732) -> PASS
+- Test 4: Grayscale PNG (L mode) -> HTTP 200 (Accepted: True, Prediction: glioma, Conf: 0.9732) -> PASS
+- Test 5: Non-standard dimensions (384x512) -> HTTP 200 (Accepted: True, Letterbox padded) -> PASS
+- Test 6: High-resolution square (600x600) -> HTTP 200 (Accepted: True, Letterbox padded) -> PASS
+Summary: All image formats and dimensions converted and processed deterministically.
+
+================================================================================
+6. INVALID INPUT TESTS
+================================================================================
+Evaluated via `test_invalid_inputs.py`:
+- Test 1: Plain text file (.txt) -> HTTP 415 Unsupported Media Type ("Unsupported file type. Please upload a valid JPG or PNG image.") -> PASS
+- Test 2: Corrupted image bytes -> HTTP 400 Bad Request ("Corrupted or unreadable image file. Unable to decode image data.") -> PASS
+- Test 3: Document PDF (.pdf) -> HTTP 415 Unsupported Media Type ("Unsupported file type. Please upload a valid JPG or PNG image.") -> PASS
+- Test 4: Empty upload (0 bytes) -> HTTP 400 Bad Request ("No image data provided. Uploaded file is empty.") -> PASS
+- Test 5: File size limit -> Rejects files exceeding 10MB limit with HTTP 400.
+Summary: All invalid inputs handled cleanly with user-friendly errors. Zero stack traces or crash events.
+
+================================================================================
+7. BACKEND FAILURE & RECOVERY TEST
+================================================================================
+- Procedure:
+  1. Terminated backend uvicorn process.
+  2. Attempted image analysis via frontend API service.
+  3. Verified frontend response:
+     - Clear user message: "Unable to connect to the analysis service. Please try again."
+     - Raw browser network exceptions or stack traces suppressed.
+     - HTTP 503 correctly caught.
+  4. Restarted FastAPI backend server.
+  5. Retried prediction request -> Immediate recovery to HTTP 200 OK. (PASS)
+
+================================================================================
+8. RESET FLOW TEST
+================================================================================
+- Flow Tested: Upload MRI -> Preview -> Analyze -> View Predictions & Grad-CAM -> Click Reset
+- Verified Reset Post-Conditions:
+  * `selectedFile`: reset to null
+  * `imagePreviewSrc`: reset to null (DOM image removed)
+  * `prediction`: reset to null (PredictionCard unmounted)
+  * `explanation`: reset to null (GradcamViewer unmounted)
+  * `guardrailRejection`: reset to null
+  * `status`: reset to "initial" (dropzone restored)
+  * `fileInputRef`: input value cleared to allow re-uploading identical file
+- Second Image Upload: Clean slate confirmed. No residual state or cached data from prior scan. (PASS)
+
+================================================================================
+9. PRIVACY AUDIT
+================================================================================
+- In-Memory Processing: Images are decoded in memory via `io.BytesIO`.
+- No Disk Persistence: Uploaded MRIs are never written to filesystem or cloud storage.
+- Ephemeral Logging: Telemetry records only high-level status (`accepted/rejected`, `reason`).
+  Zero raw pixel data or sensitive patient identifiers logged.
+- Model Training Isolation: No user uploads are ever routed to training directories (`archive/Training`).
+  Uploaded data never triggers model weight updates. (PASS)
+
+================================================================================
+10. DATASET ISOLATION TEST
+================================================================================
+- Protected Endpoints:
+  * Static file server configured with `SafeStaticFiles` middleware in `backend/main.py`.
+  * Restricts `/results` and `/samples` strictly to visual image assets (`.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`).
+- Prohibited Requests Audited:
+  * `GET /results/test_predictions.csv` -> HTTP 404 Not Found (Access Restricted)
+  * `GET /results/misclassified_images.csv` -> HTTP 404 Not Found (Access Restricted)
+  * `GET /results/high_confidence_errors.csv` -> HTTP 404 Not Found (Access Restricted)
+  * `GET /archive/Training/glioma/Tr-gl_0010.jpg` -> HTTP 404 Not Found (Unmounted)
+  * `GET /archive/Testing/glioma/Te-gl_0010.jpg` -> HTTP 404 Not Found (Unmounted)
+- Permitted Assets:
+  * `GET /results/confusion_matrix.png` -> HTTP 200 OK (Legitimate visualization)
+  * `GET /samples/sample_glioma.jpg` -> HTTP 200 OK (Controlled demonstration sample)
+Summary: Dataset files, raw CSV tables, and archive directories are strictly isolated from client access. (PASS)
+
+================================================================================
+11. RESPONSIVE DESIGN TEST
+================================================================================
+- Breakpoints Tested:
+  * Desktop (>= 1024px): 2-column layout (Input / Results side-by-side), 4-column metric grids.
+  * Tablet (641px - 1023px): Collapses stats grids to 2-columns; single column vertical layout for upload & prediction cards.
+  * Mobile (<= 640px): Full-width single column stack; navigation collapses into accessible slide-down menu; typography scaled down.
+- Visual Overflows: Zero horizontal scrolling or container overflows observed across cards, charts, and tables. (PASS)
+
+================================================================================
+12. ACCESSIBILITY AUDIT
+================================================================================
+- Semantic Hierarchy: Single `<h1>` per page with semantic `<h2>`, `<h3>` hierarchy.
+- Form Elements & Buttons: Descriptive `aria-label` and visible focus outlines on interactive elements.
+- Image Elements: Descriptive `alt` attributes on scan previews, Grad-CAM overlays, and performance charts.
+- Color Independence: Class indicators combine HSL badges with bold text labels and percentage values; information is never conveyed by color alone.
+- Contrast Ratio: Verified compliant with WCAG AA standards (high-contrast dark text on light slate backgrounds, 4.5:1+). (PASS)
+
+================================================================================
+13. PERFORMANCE MEASUREMENTS
+================================================================================
+Measured empirically over 5 iterations via `benchmark_performance.py`:
+- Frontend Initial Load: Mean = 4.37 ms (Min: 1.68 ms, Max: 9.82 ms)
+- API Health Check: Mean = 1.12 ms (Min: 0.99 ms, Max: 1.35 ms)
+- Prediction Inference Time: Mean = 143.64 ms (Min: 77.65 ms, Max: 399.37 ms)
+- Grad-CAM Generation Time: Mean = 528.98 ms (Min: 506.52 ms, Max: 601.29 ms)
+Note: Timings measured locally on CPU (PyTorch backend on macOS Apple Silicon).
+
+================================================================================
+14. BRAIN MRI INPUT GUARDRAIL
+================================================================================
+- Implementation: `src/input_guard.py` (BrainMRIInputGuard)
+- Architecture: Mandatory gate executed BEFORE preprocessing and BEFORE EfficientNetB0 inference.
+- Outcomes Supported:
+  1. VALID_MRI -> Inference continues normally.
+  2. INVALID_NON_MRI -> STOP. Returns 422/rejected payload. Classifier NEVER executed.
+  3. UNCERTAIN -> STOP. Returns 422/rejected payload. Classifier NEVER executed.
+- Server-Side Enforcement: Protected in `POST /predict`, `POST /explain`, and `src/predict.py`.
+- Critical Safety Intercept Test:
+  * Ran 9 controlled test cases in `test_guardrail_pipeline.py`.
+  * Monitored model classifier execution via test spy.
+  * Result: 0 model executions across all 8 non-MRI / corrupted / uncertain inputs.
+  * Output Audit: `results/input_guardrail_test.json` (`invariant_satisfied: true`).
+- False Acceptance / Rejection Analysis:
+  * Tested skull-edge JPEG compression ringing: Solved by filtering saturation strictly on tissue pixels (V > 0.10).
+  * Valid brain MRIs (Glioma, Meningioma, Pituitary, Normal controls) verified with 100% acceptance.
+  * Non-MRI images (photos, documents, chest X-rays, abdominal CTs, random noise) rejected 100%.
+
+================================================================================
+15. METRIC & LANGUAGE AUDIT
+================================================================================
+- Prohibited Terms Scrubbed: "diagnosis", "diagnostic accuracy", "patient diagnosis", "tumor confirmed", "tumor detected with 92.81% accuracy", "97% chance of glioma", "confirmed lesion", "tumor boundary".
+- Approved Research Terminology Adopted:
+  * "predicted class"
+  * "model confidence score"
+  * "test-set classification accuracy"
+  * "model classification result"
+  * "regions that contributed to the model's prediction"
+- Prominent Disclaimers Placed:
+  * Header/Footer & Analyze page: "This application is intended for educational and research purposes only. It is not a medical diagnostic system and should not be used for clinical decision-making."
+  * Grad-CAM card: "Grad-CAM highlights image regions that contributed to the model's prediction. It does not provide clinical localization or confirm the presence of a tumor."
+
+================================================================================
+16. KNOWN LIMITATIONS & RESEARCH CONSTRAINTS
+================================================================================
+1. Modality Gate, Not Medical Diagnostic:
+   The input guardrail validates macroscopic morphological and chromatic image properties.
+   It cannot verify scanner calibration, slice sequence protocol (T1, T2, FLAIR, T1ce), or clinical appropriateness.
+2. Single-Slice 2D Evaluation:
+   The model analyzes 2D axial/coronal slices rather than 3D volumetric MRI sequences.
+3. Class Boundary Mimicry:
+   As documented in Step 7 error analysis, 56 glioma test scans were misclassified as meningiomas
+   due to high visual similarity in peripheral infiltrative boundaries.
+
+================================================================================
+17. DEMONSTRATION SHOWCASE FLOW (3-5 MINUTES)
+================================================================================
+- STEP 1: Dashboard
+  * Introduce platform, dataset scope (7,200 scans), and headline metrics (92.81% accuracy, EfficientNetB0).
+- STEP 2: Explain Dataset & Model
+  * Outline 4 target classes: Glioma, Meningioma, Pituitary, No Tumor.
+- STEP 3: Upload MRI
+  * Navigate to "Analyze MRI". Click "Sample 2: Glioma Scan" or upload a valid MRI.
+- STEP 4: Show Prediction & Class Scores
+  * Click "Analyze MRI". Observe verification badge ("Brain MRI Verified") and probability bars.
+- STEP 5: Show Grad-CAM
+  * Toggle between "Complete 3-Panel Figure", "Grad-CAM Overlay", and "Activation Heatmap".
+- STEP 6: Demonstrate Input Guardrail
+  * Click "Guardrail Test Samples" -> "Non-MRI Photo" or "Scanned Document".
+  * Observe instantaneous guardrail rejection without running the classifier.
+- STEP 7: Show Model Performance
+  * Navigate to "Model Performance". Review raw/normalized confusion matrix and per-class metrics.
+- STEP 8: Show Error Analysis & Methodology
+  * Review misclassification distribution, confidence calibration, and academic disclaimers.
+
+================================================================================
+SUMMARY
+================================================================================
+STEP 10 COMPLETE
+
+PASS:
+- Backend operational with resident model and clean exception handling
+- Frontend Vite application fully built and linted with zero warnings
+- Prediction consistency verified across CLI, API, and Frontend (0.0 max diff)
+- Grad-CAM consistency verified using identical weights, layer, and preprocessing
+- Image format compatibility verified across Grayscale, RGB, PNG, JPG, and varied dimensions
+- Invalid input safety verified (Text, PDF, Corrupt, Empty handled without crash)
+- Backend failure handling verified with user-friendly error and instant recovery
+- Reset workflow verified with full state clearance
+- Model statistics consistent across all pages (92.81% accuracy, 92.63% Macro F1)
+- Privacy compliance verified (zero disk persistence, ephemeral memory inference)
+- Dataset isolation verified (CSVs and archive directories blocked via SafeStaticFiles)
+- Responsive layout verified across Desktop, Tablet, and Mobile
+- Accessibility compliance verified (semantic hierarchy, ARIA labels, color-independent indicators)
+- Performance measured (143ms prediction inference, 528ms Grad-CAM generation)
+- Brain MRI Input Guardrail operational and strictly enforced server-side
+- Medical language audit verified with prominent educational disclaimers
+
+WARNINGS:
+- None. All integration gates passed cleanly.
+
+FAILURES:
+- None.

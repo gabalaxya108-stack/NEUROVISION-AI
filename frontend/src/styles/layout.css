@@ -1,0 +1,548 @@
+/* ==========================================================================
+   NeuroVision AI — Layout Styles (Sidebar, Header, App Shell, Responsive)
+   ========================================================================== */
+
+/* App Shell Wrapper */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
+/* --------------------------------------------------------------------------
+   Desktop Sidebar
+   -------------------------------------------------------------------------- */
+.app-sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: transform var(--transition-normal);
+  overflow-y: auto;
+}
+
+.sidebar-brand-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.brand-logo-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-text-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  line-height: 1.15;
+}
+
+.brand-subtitle {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.sidebar-close-btn {
+  display: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  padding: 0.25rem;
+}
+
+/* Navigation List */
+.sidebar-nav {
+  flex: 1;
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle);
+  padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.sidebar-nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  text-align: left;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-nav-item:hover {
+  color: var(--primary);
+  background-color: var(--surface-secondary);
+}
+
+.sidebar-nav-item.active {
+  color: var(--primary-accent);
+  background-color: var(--primary-bg);
+  font-weight: 600;
+}
+
+.sidebar-nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background-color: var(--primary-accent-light);
+  border-radius: 0 4px 4px 0;
+}
+
+.sidebar-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.sidebar-nav-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-nav-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-tertiary);
+  color: var(--text-secondary);
+}
+
+.badge-live {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+/* Sidebar Status Box */
+.sidebar-status-box {
+  margin: 0.85rem;
+  padding: 0.85rem;
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.status-indicator-dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot-core {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.core-green { background-color: var(--success); }
+.core-amber { background-color: var(--warning); }
+
+.dot-pulse {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  opacity: 0.75;
+  animation: pulse 2s infinite;
+}
+
+.pulse-green { background-color: rgba(22, 163, 74, 0.4); }
+.pulse-amber { background-color: rgba(217, 119, 6, 0.4); }
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(0.9); opacity: 0; }
+}
+
+.status-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.status-key {
+  color: var(--text-muted);
+}
+
+.status-val {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.sidebar-privacy-pill {
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   App Main Layout (Header + Content + Footer)
+   -------------------------------------------------------------------------- */
+.app-main-layout {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Top Header
+   -------------------------------------------------------------------------- */
+.app-header {
+  height: var(--header-height);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mobile-sidebar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  padding: 0.35rem;
+  border-radius: var(--radius-sm);
+}
+
+.mobile-sidebar-toggle:hover {
+  background-color: var(--surface-secondary);
+}
+
+.header-page-title-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.crumb-sep {
+  color: var(--border-strong);
+}
+
+.crumb-active {
+  color: var(--text-secondary);
+}
+
+.header-page-heading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  margin-top: 0.1rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-online {
+  background-color: var(--success);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+}
+
+.dot-offline {
+  background-color: var(--error);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+.header-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.header-about-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* --------------------------------------------------------------------------
+   Main Content Area
+   -------------------------------------------------------------------------- */
+.app-content-area {
+  flex: 1;
+  padding: 2rem 0 3.5rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   App Footer
+   -------------------------------------------------------------------------- */
+.app-footer {
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 2rem 1.75rem 1.75rem 1.75rem;
+  margin-top: auto;
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-brand {
+  max-width: 440px;
+}
+
+.footer-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.footer-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.35rem;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.footer-link:hover {
+  color: var(--primary-accent-light);
+  text-decoration: underline;
+}
+
+.footer-disclaimer-card {
+  padding: 0.75rem 1rem;
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Backdrop & Responsive Adaptations
+   -------------------------------------------------------------------------- */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  animation: fadeIn 150ms ease-out;
+}
+
+@media (max-width: 1024px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+  }
+
+  .sidebar-close-btn {
+    display: block;
+  }
+
+  .app-main-layout {
+    margin-left: 0;
+  }
+
+  .mobile-sidebar-toggle {
+    display: flex;
+  }
+
+  .header-status-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0 1rem;
+  }
+
+  .header-page-heading {
+    font-size: 1rem;
+  }
+
+  .header-about-text {
+    display: none;
+  }
+
+  .app-content-area {
+    padding: 1.25rem 0 2.5rem 0;
+  }
+
+  .footer-top {
+    flex-direction: column;
+  }
+}

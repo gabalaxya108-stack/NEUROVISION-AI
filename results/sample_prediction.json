@@ -1,0 +1,10 @@
+{
+    "image": "demo_external_mri.jpg",
+    "predicted_class": "notumor",
+    "probabilities": {
+        "glioma": 0.0104,
+        "meningioma": 0.0037,
+        "pituitary": 0.0552,
+        "notumor": 0.9307
+    }
+}

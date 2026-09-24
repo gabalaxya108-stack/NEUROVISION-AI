@@ -1,0 +1,73 @@
+FINAL TEST DATASET EVALUATION REPORT
+======================================================================
+Project: Brain MRI Tumor Classification (Educational & Research)
+Date: September 24, 2026
+Model Evaluated: best_brain_tumor_model.keras (Step 3 Best Checkpoint)
+Preprocessing: Aspect-Ratio Preserving LetterboxResize to (224, 224), 3-Channel RGB
+======================================================================
+
+1. TEST DATASET SIZE
+   - Total Test Images: 1600
+   - Classes (Balanced): 400 glioma, 400 meningioma, 400 pituitary, 400 notumor
+
+2. OVERALL ACCURACY
+   - Test Accuracy: 0.9281 (92.81%)
+
+3. SUMMARY METRICS (MACRO & WEIGHTED)
+   - Macro Precision:    0.9313 (93.13%)
+   - Macro Recall:       0.9281 (92.81%)
+   - Macro F1-Score:     0.9263 (92.63%)
+   - Weighted Precision: 0.9313 (93.13%)
+   - Weighted Recall:    0.9281 (92.81%)
+   - Weighted F1-Score:  0.9263 (92.63%)
+
+4. PER-CLASS METRICS
+----------------------------------------------------------------------
+Class         Precision    Recall     F1-Score   Specificity* Support
+----------------------------------------------------------------------
+glioma        0.9720      0.7800     0.8655     0.9925      400
+meningioma    0.8664      0.9400     0.9017     0.9517      400
+pituitary     0.9569      1.0000     0.9780     0.9850      400
+notumor       0.9297      0.9925     0.9601     0.9750      400
+----------------------------------------------------------------------
+*Note: Specificity is computed as One-vs-Rest machine-learning metric (TN / (TN + FP)).
+
+5. PREDICTION COUNTS
+   - Correct Predictions:   1,485 (92.81%)
+   - Incorrect Predictions: 115 (7.19%)
+
+6. CONFUSION MATRIX (COUNTS)
+                Predicted:
+                glioma    meningioma  pituitary  notumor
+Actual:
+glioma          312       56          7          25
+meningioma      8         376         11         5
+pituitary       0         0           400        0
+notumor         1         2           0          397
+
+7. CONFUSION MATRIX INTERPRETATION
+- glioma: 312 of 400 correctly classified (78.0%). Minor confusion with meningioma (56).
+- meningioma: 376 of 400 correctly classified (94.0%). Confusions primarily with glioma (8) and pituitary (11).
+- pituitary: 400 of 400 correctly classified (100.0%). Highly distinctive sellar region morphology yielded highest sensitivity.
+- notumor: 397 of 400 correctly classified (99.2%). Strong separation from tumor classes.
+
+8. POTENTIAL DATA QUALITY & EVALUATION SANITY CHECKS
+- Cross-Split Contamination: Verified 0 duplicate images between Training and Testing sets (MD5 hash check).
+- Filename Leakage: Verified 0 duplicate filenames across splits; model received purely pixel tensors without filename cues.
+- Intra-Set Duplicates: As identified in Step 1, the test set contains 15 duplicate hash instances (intra-test slices).
+- Boundary Preservation: Letterbox aspect-ratio preservation ensured peripheral anatomical structures were not clipped.
+- Confidence Distribution: High mean confidence across correct predictions with lower confidence near decision boundaries.
+
+9. EXACT MODEL & PREPROCESSING SPECIFICATION
+   - Backbone: EfficientNetB0 (ImageNet Pretrained)
+   - Architecture: Input (224, 224, 3) -> EfficientNetB0 -> GlobalAveragePooling2D -> Dropout(0.3) -> Dense(4, Softmax)
+   - Preprocessing: PIL LetterboxResize to (224, 224, 3), zero-padding black borders, explicit RGB conversion.
+   - Model Path: /Users/laxyagaba/Downloads/brain_tumor_project/models/best_brain_tumor_model.keras
+
+======================================================================
+LEGAL & EDUCATIONAL DISCLAIMER:
+This project is developed exclusively for educational and academic machine
+learning research. The reported metrics are computer vision benchmark metrics
+and must NOT be interpreted as clinical sensitivity, clinical specificity, or
+medical diagnostic validation. Do NOT make medical claims or diagnoses.
+======================================================================

@@ -1,0 +1,61 @@
+{
+    "random_seed": 42,
+    "label_mapping": {
+        "glioma": 0,
+        "meningioma": 1,
+        "pituitary": 2,
+        "notumor": 3
+    },
+    "input_shape": [
+        3,
+        224,
+        224
+    ],
+    "splits": {
+        "train": {
+            "total_samples": 4480,
+            "class_counts": {
+                "glioma": 1120,
+                "meningioma": 1120,
+                "pituitary": 1120,
+                "notumor": 1120
+            },
+            "class_distribution_percent": {
+                "glioma": 25.0,
+                "meningioma": 25.0,
+                "pituitary": 25.0,
+                "notumor": 25.0
+            }
+        },
+        "validation": {
+            "total_samples": 1120,
+            "class_counts": {
+                "glioma": 280,
+                "meningioma": 280,
+                "pituitary": 280,
+                "notumor": 280
+            },
+            "class_distribution_percent": {
+                "glioma": 25.0,
+                "meningioma": 25.0,
+                "pituitary": 25.0,
+                "notumor": 25.0
+            }
+        },
+        "test": {
+            "total_samples": 1600,
+            "class_counts": {
+                "glioma": 400,
+                "meningioma": 400,
+                "pituitary": 400,
+                "notumor": 400
+            },
+            "class_distribution_percent": {
+                "glioma": 25.0,
+                "meningioma": 25.0,
+                "pituitary": 25.0,
+                "notumor": 25.0
+            }
+        }
+    }
+}

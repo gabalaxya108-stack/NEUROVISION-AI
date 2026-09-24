@@ -1,0 +1,118 @@
+{
+  "guardrail_name": "BrainMRIInputGuard",
+  "total_test_cases": 9,
+  "tests_passed": 9,
+  "success_rate": "100.0%",
+  "critical_safety_invariant": "No rejected or uncertain image ever reached the EfficientNetB0 tumor classifier.",
+  "invariant_satisfied": true,
+  "test_results": [
+    {
+      "filename": "01_valid_brain_mri.jpg",
+      "accepted": true,
+      "input_type": "brain_mri",
+      "reason": null,
+      "message": "Brain MRI image verified.",
+      "model_classifier_calls": 1,
+      "tumor_classifier_reached": true,
+      "expected_accepted": true,
+      "expected_model_calls": 1,
+      "test_passed": true
+    },
+    {
+      "filename": "02_photograph.jpg",
+      "accepted": false,
+      "input_type": "non_brain_mri",
+      "reason": "non_brain_mri",
+      "message": "This image does not appear to be a brain MRI. Please upload a brain MRI image for analysis.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "03_document.png",
+      "accepted": false,
+      "input_type": "non_brain_mri",
+      "reason": "non_brain_mri",
+      "message": "This image does not appear to be a brain MRI. Please upload a brain MRI image for analysis.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "04_screenshot.png",
+      "accepted": false,
+      "input_type": "non_brain_mri",
+      "reason": "non_brain_mri",
+      "message": "This image does not appear to be a brain MRI. Please upload a brain MRI image for analysis.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "05_xray.jpg",
+      "accepted": false,
+      "input_type": "non_brain_mri",
+      "reason": "non_brain_mri",
+      "message": "This image does not appear to be a brain MRI. Please upload a brain MRI image for analysis.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "06_ct_abdomen.jpg",
+      "accepted": false,
+      "input_type": "non_brain_mri",
+      "reason": "non_brain_mri",
+      "message": "This image does not appear to be a brain MRI. Please upload a brain MRI image for analysis.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "07_random_pattern.jpg",
+      "accepted": false,
+      "input_type": "non_brain_mri",
+      "reason": "non_brain_mri",
+      "message": "This image does not appear to be a brain MRI. Please upload a brain MRI image for analysis.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "08_low_quality_tiny.jpg",
+      "accepted": false,
+      "input_type": "uncertain",
+      "reason": "uncertain_input",
+      "message": "The image could not be confidently verified as a brain MRI. Please upload a clear brain MRI image.",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    },
+    {
+      "filename": "09_corrupted.jpg",
+      "accepted": false,
+      "input_type": "unknown",
+      "reason": null,
+      "message": "",
+      "model_classifier_calls": 0,
+      "tumor_classifier_reached": false,
+      "expected_accepted": false,
+      "expected_model_calls": 0,
+      "test_passed": true
+    }
+  ]
+}

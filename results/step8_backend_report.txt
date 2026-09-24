@@ -1,0 +1,170 @@
+================================================================================
+STEP 8 REPORT: INFERENCE BACKEND API IMPLEMENTATION
+================================================================================
+Project: Brain MRI Tumor Classification (Educational & Research)
+Model Checkpoint: models/best_brain_tumor_model.keras (EfficientNetB0)
+Date: September 24, 2026
+Backend Framework: FastAPI 0.115.6 + Uvicorn 0.34.0 (Python 3.13)
+ML Environment: Keras 3.15.1 with PyTorch 2.14.0 Backend
+
+--------------------------------------------------------------------------------
+1. BACKEND FRAMEWORK & ARCHITECTURE
+--------------------------------------------------------------------------------
+Framework: FastAPI with Uvicorn ASGI server.
+Design Pattern: Layered Service-Oriented Architecture (SOA):
+
+  Client / Future Frontend
+             ↓
+     FastAPI (backend/main.py)
+             ↓
+    Services (backend/services/)
+      ├── model_service.py        (Singleton model holder, metadata, forward pass)
+      ├── prediction_service.py   (Validation, deterministic preprocessing, formatting)
+      └── explanation_service.py  (Grad-CAM heatmap, overlay, base64 visualization)
+             ↓
+    Core ML Modules (src/)
+      ├── src/config.py           (Single source of truth for paths, class mappings)
+      ├── src/preprocessing.py    (LetterboxResize to 224x224, zero padding)
+      └── src/explain.py          (GradCAMExplainer targeting 'top_activation')
+
+Zero duplication of preprocessing logic or class mappings:
+- Class IDs strictly mapped: 0=glioma, 1=meningioma, 2=pituitary, 3=notumor.
+- Both predict and explain endpoints directly import and reuse src/ modules.
+
+--------------------------------------------------------------------------------
+2. MODEL LOADING STATUS
+--------------------------------------------------------------------------------
+Strategy: Lifespan Context Manager (FastAPI lifespan).
+Loading Mode: Loaded ONCE during application startup into memory.
+Persistence: Kept resident in RAM/VRAM across all incoming HTTP requests.
+Model Checkpoint: models/best_brain_tumor_model.keras (EfficientNetB0, 4,054,695 params).
+Startup Validation: Throws explicit RuntimeError if checkpoint is missing or corrupted.
+Status: OPERATIONAL (Load time ~0.76s on Apple Silicon MPS / CPU).
+
+--------------------------------------------------------------------------------
+3. ENDPOINTS CREATED
+--------------------------------------------------------------------------------
+1. GET /health
+   - Purpose: Service liveness and model readiness probe.
+   - Status: 200 OK
+   - Response Schema: {"status": "ok", "model_loaded": true}
+
+2. GET /model-info
+   - Purpose: Model architecture metadata, input shapes, classes, and research scope.
+   - Status: 200 OK
+   - Response Schema:
+     {
+       "model": "EfficientNetB0",
+       "input_shape": [224, 224, 3],
+       "classes": ["glioma", "meningioma", "pituitary", "notumor"],
+       "test_accuracy": 0.9281,
+       "purpose": "educational/research image classification"
+     }
+
+3. POST /predict
+   - Input: Single uploaded image file (multipart/form-data, max 10MB).
+   - Supported Formats: JPG/JPEG, PNG.
+   - Processing: In-memory PIL decoding -> LetterboxResize (224x224) -> Model forward pass.
+   - Response Schema:
+     {
+       "predicted_class": "glioma",
+       "confidence": 0.782,
+       "probabilities": {
+         "glioma": 0.782,
+         "meningioma": 0.173,
+         "pituitary": 0.011,
+         "notumor": 0.034
+       }
+     }
+   - Metric Nomenclature: "model confidence score" (Strictly non-diagnostic).
+
+4. POST /explain
+   - Input: Single uploaded MRI scan (multipart/form-data, max 10MB).
+   - Supported Formats: JPG/JPEG, PNG.
+   - Processing: In-memory PIL decoding -> LetterboxResize -> Grad-CAM on 'top_activation' ->
+                 Geometric un-letterboxing -> JET colormap overlay -> Base64 encoding.
+   - Response Schema:
+     {
+       "predicted_class": "notumor",
+       "confidence": 0.9307,
+       "probabilities": {...},
+       "gradcam_overlay_base64": "data:image/png;base64,...",
+       "gradcam_heatmap_base64": "data:image/png;base64,...",
+       "gradcam_panel_base64": "data:image/png;base64,..."
+     }
+
+--------------------------------------------------------------------------------
+4. PREPROCESSING REUSE & PARITY STATUS
+--------------------------------------------------------------------------------
+- Preprocessing Reuse: 100% reused from src/preprocessing.py (LetterboxResize).
+- Class Mapping Reuse: 100% reused from src/config.py (CLASSES, ID2LABEL, LABEL2ID).
+- Standalone vs API Consistency (Sample: demo_external_mri.jpg):
+  - Standalone Predicted Class: notumor
+  - API Predicted Class:        notumor
+  - Probability Parity:
+      * Glioma:     Standalone=0.0104 | API=0.0104 (diff = 0.000000)
+      * Meningioma: Standalone=0.0037 | API=0.0037 (diff = 0.000000)
+      * Pituitary:  Standalone=0.0552 | API=0.0552 (diff = 0.000000)
+      * No Tumor:   Standalone=0.9307 | API=0.9307 (diff = 0.000000)
+  - Consistency Verdict: PERFECT PARITY (0.000000 discrepancy).
+
+--------------------------------------------------------------------------------
+5. GRAD-CAM INTEGRATION STATUS
+--------------------------------------------------------------------------------
+- GradCAMExplainer reused directly from src/explain.py.
+- The explainer reuses the pre-loaded model instance from ModelService (zero duplicate memory).
+- Visualizations are rendered to in-memory byte buffers using headless Matplotlib ('Agg').
+- No temporary image files written to disk; eliminates disk leakage and storage clutter.
+- Outputs clean base64 Data URIs ready for instant rendering in frontend <img> tags.
+
+--------------------------------------------------------------------------------
+6. API TEST RESULTS (backend/test_api.py)
+--------------------------------------------------------------------------------
+Test 1: GET /health .................................................... PASSED
+Test 2: GET /model-info ................................................ PASSED
+Test 3: POST /predict (Controlled sample: demo_external_mri.jpg) ........ PASSED
+Test 4: Parity verification (src/predict.py vs POST /predict) .......... PASSED
+Test 5: Error handling (invalid text file -> 415, corrupted jpg -> 400,
+                       empty file -> 400) .............................. PASSED
+Test 6: POST /explain (Grad-CAM visualization base64 generation) ....... PASSED
+
+Overall Test Result: 6/6 TESTS PASSED (100% SUCCESS RATE)
+
+--------------------------------------------------------------------------------
+7. SECURITY & PRIVACY MEASURES
+--------------------------------------------------------------------------------
+1. File Size Protection: Enforced 10MB maximum upload limit.
+2. Magic Header & Decoding Validation: Validated with PIL verify() on in-memory buffers;
+   does not blindly trust file extensions.
+3. Strict Format Whitelisting: Accepts only valid JPEG and PNG files.
+4. Non-Executable Storage: Uploaded images are processed entirely in RAM (io.BytesIO)
+   and immediately garbage collected. No files are written to disk.
+5. Error Sanitization: Python exception stack traces are suppressed in HTTP responses;
+   standardized JSON format {"error": "..."} returned to clients.
+6. CORS Hardening: Configured for local development origins (localhost:3000, 5173, 8000, etc.)
+   rather than open wildcard origins.
+7. Privacy: Zero collection or persistence of Patient Health Information (PHI/PII).
+
+--------------------------------------------------------------------------------
+8. HOW TO RUN THE BACKEND
+--------------------------------------------------------------------------------
+Command:
+  uvicorn backend.main:app --reload
+
+Or via Python module:
+  python3 -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+
+Local Access URLs:
+- API Base URL:       http://127.0.0.1:8000
+- Health Check:       http://127.0.0.1:8000/health
+- Model Metadata:     http://127.0.0.1:8000/model-info
+- Interactive Swagger: http://127.0.0.1:8000/docs
+- Alternative ReDoc:  http://127.0.0.1:8000/redoc
+
+--------------------------------------------------------------------------------
+9. EDUCATIONAL AND RESEARCH DISCLAIMER
+--------------------------------------------------------------------------------
+This application and API are developed exclusively for educational and academic research
+purposes. Softmax outputs represent statistical model confidence scores and do NOT
+constitute clinical diagnostic probability, medical certainty, or therapeutic recommendations.
+================================================================================

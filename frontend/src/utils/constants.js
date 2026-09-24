@@ -2,10 +2,17 @@
  * Brain MRI Tumor Classification - Constants & Educational Metadata
  */
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL !== undefined
-    ? import.meta.env.VITE_API_URL
-    : (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
+// Sanitize and normalize API Base URL
+const rawApiUrl = (import.meta.env.VITE_API_URL || "").trim();
+let sanitizedUrl = rawApiUrl.replace(/\/+$/, "");
+
+// Prevent Mixed Content: If page is loaded over HTTPS, upgrade backend URL from http to https
+if (typeof window !== "undefined" && window.location.protocol === "https:" && sanitizedUrl.startsWith("http://")) {
+  sanitizedUrl = sanitizedUrl.replace(/^http:\/\//, "https://");
+}
+
+export const API_BASE_URL = sanitizedUrl || (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
+
 
 export const CLASSES = ["glioma", "meningioma", "pituitary", "notumor"];
 

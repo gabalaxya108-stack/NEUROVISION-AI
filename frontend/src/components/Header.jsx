@@ -9,6 +9,8 @@ export default function Header({
 }) {
   const isLoaded = backendStatus?.model_loaded === true;
   const isOnline = backendStatus?.status === "ok";
+  const isWaking = backendStatus?.status === "waking";
+  const isUnconfigured = backendStatus?.status === "unconfigured";
 
   const pageTitles = {
     dashboard: "Platform Overview",
@@ -54,9 +56,17 @@ export default function Header({
       <div className="header-right">
         {/* Model Status Pill */}
         <div className="header-status-pill">
-          <span className={`pill-dot ${isOnline && isLoaded ? "dot-online" : "dot-offline"}`} />
+          <span className={`pill-dot ${isOnline && isLoaded ? "dot-online" : isWaking ? "dot-waking" : "dot-offline"}`} />
           <span className="pill-text">
-            {isOnline && isLoaded ? "Model Ready · 92.81% Acc" : isOnline ? "Loading Checkpoint..." : "Backend Disconnected"}
+            {isOnline && isLoaded
+              ? "Model Ready · 92.81% Acc"
+              : isWaking
+              ? "Cloud Backend Waking Up..."
+              : isUnconfigured
+              ? "Backend URL Not Set (Add VITE_API_URL)"
+              : isOnline
+              ? "Loading Checkpoint..."
+              : "Backend Disconnected"}
           </span>
         </div>
 

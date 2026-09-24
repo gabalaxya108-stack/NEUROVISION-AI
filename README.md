@@ -271,25 +271,71 @@ python run_step7_analysis.py
 
 The project includes a lightweight, production-grade inference REST API built with **FastAPI** and **Uvicorn**.
 
-### 7.1 Backend Requirements & Installation
+### 7.1 Backend Requirements & Virtual Environment Setup
 
-The backend uses Python 3.10+ and the existing project environment with FastAPI, Uvicorn, Python-Multipart, and HTTPX:
+The backend uses Python 3.10+ and the project environment with FastAPI, Uvicorn, Python-Multipart, and HTTPX.
 
+#### macOS / Linux:
 ```bash
+# 1. Create a virtual environment (recommended)
+python3 -m venv venv
+
+# 2. Activate the virtual environment
+source venv/bin/activate
+
+# 3. Install requirements
+pip install -r requirements.txt
+```
+
+#### Windows:
+**Command Prompt (CMD):**
+```cmd
+:: 1. Create a virtual environment
+python -m venv venv
+
+:: 2. Activate the virtual environment
+venv\Scripts\activate
+
+:: 3. Install requirements
+pip install -r requirements.txt
+```
+
+**PowerShell:**
+```powershell
+# 1. Create a virtual environment
+python -m venv venv
+
+# 2. Activate the virtual environment
+.\venv\Scripts\Activate.ps1
+
+# Note: If PowerShell shows a script execution policy error, run:
+# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 3. Install requirements
 pip install -r requirements.txt
 ```
 
 ### 7.2 How to Start the API Server
 
-Start the local server with auto-reload:
-
+#### macOS / Linux:
 ```bash
-uvicorn backend.main:app --reload
+# Ensure virtual environment is active
+source venv/bin/activate
+
+# Start the FastAPI server with auto-reload
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Or via Python module:
+#### Windows:
+**Command Prompt (CMD):**
+```cmd
+venv\Scripts\activate
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
 
-```bash
+**PowerShell:**
+```powershell
+.\venv\Scripts\Activate.ps1
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -413,29 +459,130 @@ A research-grade single-page application built with **React** and **Vite**, feat
 
 ### 8.2 How to Start the Frontend
 
-In a separate terminal window:
+The frontend requires **Node.js (v18+)** and **npm**.
 
+#### macOS / Linux:
 ```bash
+# Navigate to the frontend directory
 cd frontend
+
+# Install Node dependencies (first time only)
 npm install
+
+# Start Vite development server
 npm run dev
 ```
 
-The application will be live at:
+#### Windows:
+**Command Prompt (CMD):**
+```cmd
+:: Navigate to the frontend directory
+cd frontend
 
-- **Local Web App URL:** `http://127.0.0.1:5173` (or `http://localhost:5173`)
+:: Install Node dependencies (first time only)
+npm install
 
-### 8.3 Full-Stack Local Execution Summary
-
-To run the full stack simultaneously:
-
-```bash
-# Terminal 1: Backend API (FastAPI)
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
-
-# Terminal 2: Frontend Web App (Vite)
-cd frontend && npm run dev
+:: Start Vite development server
+npm run dev
 ```
+
+**PowerShell:**
+```powershell
+# Navigate to the frontend directory
+cd frontend
+
+# Install Node dependencies (first time only)
+npm install
+
+# Start Vite development server
+npm run dev
+```
+
+Once running, navigate to:
+
+- **Local Web App URL:** `http://localhost:5173` (or `http://127.0.0.1:5173`)
+
+---
+
+### 8.3 Full-Stack Local Execution Guide (macOS & Windows)
+
+To run the complete platform locally, open two separate terminal windows (one for the backend API and one for the frontend UI).
+
+#### Option 1: macOS / Linux
+
+**Terminal 1 — Backend REST API:**
+```bash
+# From repository root
+python3 -m venv venv              # Run once to create virtual environment
+source venv/bin/activate          # Activate virtual environment
+pip install -r requirements.txt    # Run once to install dependencies
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+**Terminal 2 — Frontend Web Application:**
+```bash
+# From repository root
+cd frontend
+npm install                        # Run once to install dependencies
+npm run dev
+```
+
+---
+
+#### Option 2: Windows (PowerShell)
+
+**Terminal 1 — Backend REST API:**
+```powershell
+# From repository root
+python -m venv venv                # Run once to create virtual environment
+.\venv\Scripts\Activate.ps1        # Activate virtual environment
+# Tip: If script execution is blocked, run: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+pip install -r requirements.txt    # Run once to install dependencies
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+**Terminal 2 — Frontend Web Application:**
+```powershell
+# From repository root
+cd frontend
+npm install                        # Run once to install dependencies
+npm run dev
+```
+
+---
+
+#### Option 3: Windows (Command Prompt / CMD)
+
+**Terminal 1 — Backend REST API:**
+```cmd
+:: From repository root
+python -m venv venv                :: Run once to create virtual environment
+venv\Scripts\activate              :: Activate virtual environment
+pip install -r requirements.txt    :: Run once to install dependencies
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+**Terminal 2 — Frontend Web Application:**
+```cmd
+:: From repository root
+cd frontend
+npm install                        :: Run once to install dependencies
+npm run dev
+```
+
+---
+
+#### 8.4 Local Endpoints & Access Reference
+
+| Service | Local URL | Description |
+| :--- | :--- | :--- |
+| **Frontend Web App** | `http://localhost:5173` | Interactive React + Vite clinical research UI |
+| **Backend API** | `http://127.0.0.1:8000` | FastAPI inference server |
+| **Interactive API Docs** | `http://127.0.0.1:8000/docs` | Swagger UI for testing `/predict`, `/explain`, etc. |
+| **Health Check** | `http://127.0.0.1:8000/health` | Verifies server and model readiness |
+
+> [!TIP]
+> The Vite frontend includes a reverse proxy configured to forward `/predict`, `/explain`, `/health`, `/model-info`, `/results`, and `/samples` directly to `http://127.0.0.1:8000`. Keep the backend running while using the web interface.
 
 ---
 

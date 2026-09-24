@@ -303,6 +303,18 @@ if FRONTEND_DIST.exists():
         if index_file.is_file():
             return FileResponse(index_file)
         raise HTTPException(status_code=404, detail="Frontend build index.html not found")
+else:
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return {
+            "name": "NeuroVision AI - Brain MRI Inference Backend",
+            "status": "online",
+            "model": "EfficientNetB0",
+            "docs": "/docs",
+            "health": "/health",
+            "model_info": "/model-info",
+        }
+
 
 
 if __name__ == "__main__":

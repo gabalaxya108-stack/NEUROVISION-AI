@@ -79,24 +79,15 @@ app = FastAPI(
 )
 
 # CORS Configuration
-# Allows standard local frontend development environments (Vite, React, Next.js, vanilla servers)
-CORS_ORIGINS = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-]
+# Supports local frontend dev as well as cloud deployment environments
+ENV_CORS = os.getenv("CORS_ORIGINS")
+CORS_ORIGINS = [orig.strip() for orig in ENV_CORS.split(",")] if ENV_CORS else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -288,6 +279,30 @@ async def explain_mri(file: UploadFile = File(...)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while generating Grad-CAM explainability.",
         )
+
+
+# Mount built frontend single-page application (SPA) if present
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    from fastapi.responses import FileResponse
+
+    if (FRONTEND_DIST / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="frontend_assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(request: Request, full_path: str):
+        # Do not intercept API endpoints, docs, or explicit static mounts
+        if full_path.startswith(("health", "model-info", "predict", "explain", "docs", "redoc", "openapi.json", "results", "samples")):
+            raise HTTPException(status_code=404, detail="Endpoint not found")
+        
+        target_file = FRONTEND_DIST / full_path
+        if target_file.is_file():
+            return FileResponse(target_file)
+        
+        index_file = FRONTEND_DIST / "index.html"
+        if index_file.is_file():
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Frontend build index.html not found")
 
 
 if __name__ == "__main__":

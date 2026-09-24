@@ -1,3 +1,14 @@
+---
+title: NeuroVision AI - Brain MRI Classification Platform
+emoji: 🧠
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # Brain MRI Tumor Classification Project
 
 A deep-learning classification pipeline for multi-class Brain MRI scans using transfer learning with **EfficientNetB0**.
